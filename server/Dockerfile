@@ -2,8 +2,8 @@ FROM alpine:3.17
 
 FROM node:18
 
-# Create app directory
-WORKDIR /usr/src/app
+# Create server directory
+WORKDIR /usr/src/server
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -15,7 +15,7 @@ RUN npm install
 # RUN npm ci --omit=dev
 
 # Bundle app source
-COPY . .
+COPY . ./
 
 EXPOSE 8080
 # Start the Node.js application
