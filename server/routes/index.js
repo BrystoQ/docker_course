@@ -21,14 +21,18 @@ const routes = (app) => {
       });
   });
 
-  router.get("/", (req, res) => {
-    Todo.find({}, { __v: 0 })
-      .then((todos) => {
-        serverResponses.sendSuccess(res, messages.SUCCESSFUL, todos);
+  router.get("/messageText", (req, res) => {
+    MessageText.find({}, { __v: 0 })
+      .then((messageTexts) => {
+        serverResponses.sendSuccess(res, messages.SUCCESSFUL, messageTexts);
       })
       .catch((e) => {
         serverResponses.sendError(res, messages.BAD_REQUEST, e);
       });
+  });
+
+  router.get("/", (req, res) => {
+    res.send("Hello World!");
   });
 
   app.use("/api", router);

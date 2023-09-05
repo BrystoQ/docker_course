@@ -4,21 +4,26 @@ services:
     container_name: project_server
     env_file:
       - ./server/.env
+    environment:
+      - NODE_ENV=development
     build:
       context: ./server
+      target: dev
     ports:
       - "8080:8080"
     volumes:
-      - "./src:/home/node/app"
+      - "./server:/usr/src/server"
     links:
       - mongo
     networks:
       - mongodb
     depends_on:
       - mongo
+    tty: true
 
   mongo:
     container_name: project_mongo
+    restart: always
     image: "mongo:latest"
     ports:
       - "27017:27017"
@@ -26,8 +31,11 @@ services:
       - ./database:/data/db
     networks:
       - mongodb
+
   app:
     container_name: client_app
+    environment:
+      - NODE_ENV=development
     build:
       context: ./client
     ports:

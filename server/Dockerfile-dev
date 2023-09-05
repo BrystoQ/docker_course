@@ -1,0 +1,9 @@
+FROM alpine:3.17
+
+# Use node stable version
+FROM node:18
+
+# Create server directory
+WORKDIR /usr/src/server
+
+EXPOSE 8080

@@ -1,6 +1,16 @@
-FROM alpine:3.17
+# Use Alpine with node 18
+FROM node:18-alpine as dev
 
-FROM node:18
+USER node
+# Create server directory
+WORKDIR /usr/src/server
+
+EXPOSE 3000
+
+# Use Alpine with node 18
+FROM node:18-alpine as production
+# Use user node
+USER node
 
 # Create server directory
 WORKDIR /usr/src/server
@@ -10,7 +20,7 @@ WORKDIR /usr/src/server
 # where available (npm@5+)
 COPY package*.json ./
 
-RUN npm install
+RUN yarn install
 # If you are building your code for production
 # RUN npm ci --omit=dev
 
