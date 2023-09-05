@@ -5,7 +5,9 @@ USER node
 # Create server directory
 WORKDIR /usr/src/server
 
-EXPOSE 3000
+EXPOSE 3001
+
+CMD [ "yarn", "dev" ]
 
 # Use Alpine with node 18
 FROM node:18-alpine as production
@@ -27,6 +29,6 @@ RUN yarn install
 # Bundle app source
 COPY . ./
 
-EXPOSE 8080
+EXPOSE 3001
 # Start the Node.js application
 CMD [ "yarn", "start" ]

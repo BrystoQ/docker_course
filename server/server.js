@@ -17,6 +17,10 @@ app.use(cors());
 // Add routes
 require("./routes")(app);
 
+app.get("/", (req, res) => {
+  res.send(`The server is on ${process.env.NODE_ENV} mode`);
+});
+
 app.on("ready", () => {
   app.listen(port, () => {
     console.log("Server is up on port", port);

@@ -10,7 +10,7 @@ services:
       context: ./server
       target: dev
     ports:
-      - "8080:8080"
+      - "3001:3001"
     volumes:
       - "./server:/usr/src/server"
     links:
@@ -37,9 +37,13 @@ services:
     environment:
       - NODE_ENV=development
     build:
+      target: dev
       context: ./client
     ports:
       - "3000:3000"
+    volumes:
+      - "./client:/usr/src/client"
+    tty: true
 
 networks:
   mongodb:

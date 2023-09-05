@@ -31,10 +31,6 @@ const routes = (app) => {
       });
   });
 
-  router.get("/", (req, res) => {
-    res.send("Hello World!");
-  });
-
   app.use("/api", router);
 };
 module.exports = routes;
