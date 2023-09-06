@@ -5,12 +5,14 @@ services:
     env_file:
       - ./server/.env
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
     build:
       context: ./server
-      target: production
+      target: dev
     ports:
       - "3001:3001"
+    volumes:
+      - "./server:/usr/src/server"
     links:
       - mongo
     networks:
@@ -33,12 +35,14 @@ services:
   app:
     container_name: client_app
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
     build:
-      target: production
+      target: dev
       context: ./client
     ports:
       - "3000:3000"
+    volumes:
+      - "./client:/usr/src/client"
     tty: true
 
 networks:
