@@ -1,5 +1,5 @@
 # Use Alpine with node 18
-FROM node:18-alpine as dev
+FROM node:18-alpine AS dev
 
 USER node
 # Create client directory
@@ -10,7 +10,7 @@ EXPOSE 3000
 CMD [ "yarn", "start" ] 
 
 # Use Alpine with node 18
-FROM node:18-alpine as production
+FROM node:18-alpine AS production
 # Use user node
 USER node
 
