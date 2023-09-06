@@ -1,0 +1,105 @@
+version: "3"
+services:
+  server:
+    container_name: project_server
+    env_file:
+      - ./server/.env
+    environment:
+      - NODE_ENV=production
+    build:
+      context: ./server
+      target: production
+    ports:
+      - "3001:3001"
+    links:
+      - mongo
+    networks:
+      - mongodb
+    depends_on:
+      - mongo
+    tty: true
+
+  mongo:
+    container_name: project_mongo
+    restart: always
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./database:/data/db
+    networks:
+      - mongodb
+
+  app:
+    container_name: client_app
+    environment:
+      - NODE_ENV=production
+    build:
+      target: production
+      context: ./client
+    ports:
+      - "3000:3000"
+    tty: true
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    networks:
+      - elk
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./elk/elasticsearch/data:/usr/share/elasticsearch/data
+    environment:
+      - "discovery.type=single-node"
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.9.0
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD}
+    networks:
+      - elk
+    ports:
+      - "5601:5601"
+    volumes:
+      - ./elk/kibana/data:/usr/share/kibana/data
+      - ./elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:8.9.0
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    networks:
+      - elk
+    ports:
+      - "5044:5044"
+    volumes:
+      - ./elk/logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+    depends_on:
+      - elasticsearch
+
+  filebeat:
+    container_name: filebeat
+    image: docker.elastic.co/beats/filebeat:8.9.0
+    user: root
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    volumes:
+      - ./elk/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+      - logstash
+
+networks:
+  mongodb:
+    driver: bridge
+  elk:
+    driver: bridge
