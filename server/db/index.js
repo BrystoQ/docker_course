@@ -1,5 +1,6 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
+const logger = require("../config/logger");
 
 exports.connect = (app) => {
   const options = {
@@ -10,14 +11,18 @@ exports.connect = (app) => {
 
   const connectWithRetry = () => {
     mongoose.Promise = global.Promise;
-    console.log("MongoDB connection with retry");
     mongoose
       .connect(process.env.MONGODB_URI, options)
       .then(() => {
+        logger.info("MongoDB is connected");
         console.log("MongoDB is connected");
         app.emit("ready");
       })
       .catch((err) => {
+        logger.error(
+          "MongoDB connection unsuccessful, retry after 2 seconds.",
+          err
+        );
         console.log(
           "MongoDB connection unsuccessful, retry after 2 seconds.",
           err

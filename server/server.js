@@ -1,4 +1,5 @@
 require("dotenv").config();
+const logger = require("./config/logger");
 
 const express = require("express");
 const app = express();
@@ -23,7 +24,7 @@ app.get("/", (req, res) => {
 
 app.on("ready", () => {
   app.listen(port, () => {
-    console.log("Server is up on port", port);
+    logger.info(`Server is up on port ${port}`);
   });
 });
 
