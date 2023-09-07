@@ -1,105 +1,110 @@
-version: "3"
-services:
-  server:
-    container_name: project_server
-    env_file:
+version: "3" # specify docker-compose version
+services: # services list
+  server: # service name
+    container_name: project_server # container name
+    env_file: # environment variables
       - ./server/.env
-    environment:
+    environment: # environment variables
       - NODE_ENV=production
-    build:
+    build: # build context
       context: ./server
       target: production
-    ports:
+    ports: # port mapping
       - "3001:3001"
-    links:
+    links: # link to other services
       - mongo
-    networks:
+    networks: # network name
       - mongodb
-    depends_on:
+      - client
+    depends_on: # depend on other services
       - mongo
-    tty: true
+    tty: true # allocate pseudo-TTY
 
-  mongo:
-    container_name: project_mongo
-    restart: always
-    image: "mongo:latest"
-    ports:
+  mongo: # service name
+    container_name: project_mongo # container name
+    restart: always # restart policy
+    image: "mongo:latest" # docker image
+    ports: # port mapping
       - "27017:27017"
-    volumes:
+    volumes: # volume mapping
       - ./database:/data/db
-    networks:
+    networks: # network name
       - mongodb
 
-  app:
-    container_name: client_app
-    environment:
+  app: # service name
+    container_name: client_app # container name
+    environment: # environment variables
       - NODE_ENV=production
-    build:
+    build: # build context
       target: production
       context: ./client
-    ports:
-      - "3000:3000"
-    tty: true
+    ports: # port mapping
+      - 8080:80
+    tty: true # allocate pseudo-TTY
+    networks: # network name
+      - client
 
-  elasticsearch:
-    container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
-    networks:
+  elasticsearch: # service name
+    container_name: elasticsearch # container name
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0 # docker image
+    networks: # network name
       - elk
-    ports:
+    ports: # port mapping
       - "9200:9200"
-    volumes:
+    volumes: # volume mapping
       - ./elk/elasticsearch/data:/usr/share/elasticsearch/data
-    environment:
+    environment: # environment variables
       - "discovery.type=single-node"
 
-  kibana:
-    container_name: kibana
-    image: docker.elastic.co/kibana/kibana:8.9.0
-    environment:
+  kibana: # service name
+    container_name: kibana # container name
+    image: docker.elastic.co/kibana/kibana:8.9.0 # docker image
+    environment: # environment variables
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD}
-    networks:
+    networks: # network name
       - elk
-    ports:
+    ports: # port mapping
       - "5601:5601"
-    volumes:
+    volumes: # volume mapping
       - ./elk/kibana/data:/usr/share/kibana/data
       - ./elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
 
-  logstash:
-    container_name: logstash
-    image: docker.elastic.co/logstash/logstash:8.9.0
-    environment:
+  logstash: # service name
+    container_name: logstash # container name
+    image: docker.elastic.co/logstash/logstash:8.9.0 # docker image
+    environment: # environment variables
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-    networks:
+    networks: # network name
       - elk
-    ports:
+    ports: # port mapping
       - "5044:5044"
-    volumes:
+    volumes: # volume mapping
       - ./elk/logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-    depends_on:
+    depends_on: # depend on other services
       - elasticsearch
 
-  filebeat:
-    container_name: filebeat
-    image: docker.elastic.co/beats/filebeat:8.9.0
-    user: root
-    environment:
+  filebeat: # service name
+    container_name: filebeat # container name
+    image: docker.elastic.co/beats/filebeat:8.9.0 # docker image
+    user: root # user
+    environment: # environment variables
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-    volumes:
+    volumes: # volume mapping
       - ./elk/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
       - /var/lib/docker:/var/lib/docker:ro
       - /var/run/docker.sock:/var/run/docker.sock
-    networks:
+    networks: # network name
       - elk
-    depends_on:
+    depends_on: # depend on other services
       - elasticsearch
       - logstash
 
-networks:
+networks: # network name
   mongodb:
     driver: bridge
   elk:
+    driver: bridge
+  client:
     driver: bridge

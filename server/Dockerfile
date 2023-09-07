@@ -1,16 +1,14 @@
 # Use Alpine with node 18
-FROM node:18-alpine AS dev
+FROM node:18-alpine as dev
 
 USER node
 # Create server directory
 WORKDIR /usr/src/server
 
-EXPOSE 3001
-
-CMD [ "yarn", "dev" ]
+EXPOSE 3000
 
 # Use Alpine with node 18
-FROM node:18-alpine AS production
+FROM node:18-alpine as production
 # Use user node
 USER node
 
